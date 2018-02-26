@@ -5,40 +5,35 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 
-public class server extends JFrame implements ActionListener{
+public class client extends JFrame implements ActionListener{
     static JTextArea content;
     static JButton send;
     static JTextField inputJText, toName;
-    static String inputString = "";
-    static String temp = "";
-    static ServerSocket serA;
-    static Socket s, sA;
+    static String inputString = "", temp = "", addrr = "";
+    static Socket s, sB;
     static PrintWriter newSend;
 
     public static void main(String[] args) {
-        new server();
         try{
-            serA = new ServerSocket(2222);
-            s = serA.accept();
-            while (true){
-                BufferedReader nhan = new BufferedReader(new InputStreamReader(s.getInputStream()));
-                while ((inputString = nhan.readLine()) != null){
-                    temp += inputString + "\n";
-                    content.setText(temp);
-                    content.setVisible(false);
-                    content.setVisible(true);
-                }
+            String ip = JOptionPane.showInputDialog(null, "Input IP server");
+            new client();
+            sB = new Socket(ip, 222);
+            BufferedReader nhan = new BufferedReader(new InputStreamReader(sB.getInputStream()));
+            while ((inputString = nhan.readLine()) != null){
+                temp += inputString + "\n";
+                content.setText(temp);
+                content.setVisible(false);
+                content.setVisible(true);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
     }
-    public server(){
+    public client(){
         setSize(600, 600);
-        setTitle("Server Chat B16D47");
+        setTitle("Client");
         Font font = new Font("Arial", Font.BOLD, 20);
 
         content = new JTextArea();
@@ -61,17 +56,18 @@ public class server extends JFrame implements ActionListener{
 
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
     }
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(inputJText)){
             try{
                 newSend = new PrintWriter(s.getOutputStream(), true);
-                temp += toName.getText() + ": " + inputJText.getText() + "\n";
                 newSend.println(toName.getText() + ": " + inputJText.getText());
-                content.setText(temp);
+                temp += toName.getText() + ": " + inputJText.getText() + "\n";
                 inputJText.setText("");
                 inputJText.requestFocus();
+                content.setText(temp);
                 content.setVisible(false);
                 content.setVisible(true);
             }catch (Exception r){
